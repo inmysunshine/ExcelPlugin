@@ -1,0 +1,175 @@
+Function CalCrack1(M As Double, BHC0 As Double, D As Double, gap As Double, BHC2 As Double, D2 As Double, gap2 As Double, h As Double)
+    '板宽按照1米计算，根据国标计算裂缝
+    'BHC0为净保护层厚度
+    BHC_1 = BHC0 + D / 2
+    BHC_2 = BHC2 + D / 2
+    n1 = 1000 / gap
+    n2 = 1000 / gap2
+    BHC = ((BHC_1 * n1) + (BHC_2 * n2)) / (n1 + n2)
+    h0 = h - BHC
+    b = 1000
+    fc = 19.7
+    ftk = 1.71
+    fy = 360
+    Es = 2 * 100000
+    'a = M * 1000000 / (fc * b * h0 * h0)
+    'b1 = 1 - Sqr(1 - 2 * a)
+    '受拉钢筋面积
+    'Area = b1 * fc * b * h0 / fy
+    '实际配筋
+    Area_Real = 1000 / gap * 3.1415926 * D * D / 4 + 1000 / gap2 * 3.1415926 * D2 * D2 / 4
+    p = Area_Real / (b * h)
+    x = fy * Area_Real / (fc * b)
+    b2 = 0.8 / (1 + (fy / (Es * 0.0033)))
+        
+    If (x > b2 * h0) Then
+        CalStress = "受压区高度不满足要求"
+        Exit Function
+    End If
+    
+    pte = Area_Real / (0.5 * b * h)
+    If (pte < 0.01) Then
+        pte = 0.01
+    End If
+    
+    acr = 1.9
+    stress = M * 1000000 / (0.87 * h0 * Area_Real)
+    f = 1.1 - 0.65 * ftk / (pte * stress)
+    
+    If (f < 0.2) Then
+        f = 0.2
+    End If
+    If (f > 1) Then
+        f = 1
+    End If
+     
+    If (BHC0 < 20) Then
+        BHC0 = 20
+    End If
+    If (BHC0 > 65) Then
+        BHC0 = 65
+    End If
+    dte = (n1 * D * D + n2 * D2 * D2) / (n1 * D + n2 * D2)
+ 
+    
+    w = acr * f * stress * (1.9 * BHC0 + 0.08 * dte / pte) / Es
+    
+    'Row = Application.Caller.Row
+    CalCrack1 = w
+End Function
+
+Function CalStress1(M As Double, BHC0 As Double, D As Double, gap As Double, BHC2 As Double, D2 As Double, gap2 As Double, h As Double)
+    '板宽按照1米计算，根据国标计算裂缝
+    'BHC0为净保护层厚度
+    BHC_1 = BHC0 + D / 2
+    BHC_2 = BHC2 + D / 2
+    n1 = 1000 / gap
+    n2 = 1000 / gap2
+    BHC = ((BHC_1 * n1) + (BHC_2 * n2)) / (n1 + n2)
+    h0 = h - BHC
+    b = 1000
+    fc = 19.7
+    ftk = 1.71
+    fy = 360
+    Es = 2 * 100000
+    'a = M * 1000000 / (fc * b * h0 * h0)
+    'b1 = 1 - Sqr(1 - 2 * a)
+    '受拉钢筋面积
+    'Area = b1 * fc * b * h0 / fy
+    '实际配筋
+    Area_Real = 1000 / gap * 3.1415926 * D * D / 4 + 1000 / gap2 * 3.1415926 * D2 * D2 / 4
+    p = Area_Real / (b * h)
+    x = fy * Area_Real / (fc * b)
+    b2 = 0.8 / (1 + (fy / (Es * 0.0033)))
+        
+    If (x > b2 * h0) Then
+        CalStress = "受压区高度不满足要求"
+        Exit Function
+    End If
+    
+    pte = Area_Real / (0.5 * b * h)
+    If (pte < 0.01) Then
+        pte = 0.01
+    End If
+    
+    acr = 1.9
+    stress = M * 1000000 / (0.87 * h0 * Area_Real)
+    f = 1.1 - 0.65 * ftk / (pte * stress)
+    
+    If (f < 0.2) Then
+        f = 0.2
+    End If
+    If (f > 1) Then
+        f = 1
+    End If
+     
+    If (BHC0 < 20) Then
+        BHC0 = 20
+    End If
+    If (BHC0 > 65) Then
+        BHC0 = 65
+    End If
+    dte = (n1 * D * D + n2 * D2 * D2) / (n1 * D + n2 * D2)
+ 
+    
+    w = acr * f * stress * (1.9 * BHC0 + 0.08 * dte / pte) / Es
+    
+    'Row = Application.Caller.Row
+    CalStress1 = stress
+    
+End Function
+
+
+Function CalCapacity(BHC0 As Double, D As Double, gap As Double, h As Double, Dy As Double, gap_y As Double)
+    '按照双筋截面的方法进行承载能力计算
+    '板宽按照1米计算
+    'BHC0为净保护层厚度
+    fy = 360
+    a1 = 1
+    fc = 21.1
+    Es = 200000
+    
+    b = 1000
+    BHC = BHC0 + D / 2
+    h0 = h - BHC
+    N = 1000 / gap
+    Area = N * 3.1415926 * D * D / 4
+    p = Area / (b * h0)
+    
+    '如果Dy,gap_y为负，那么说明受压钢筋和受拉钢筋一样
+    If (Dy < 0) Then
+        Dy = D
+    End If
+    If (gap_y < 0) Then
+        gap_y = gap
+    End If
+  
+    Ny = 1000 / gap_y
+    Area_y = Ny * 3.1415926 * Dy * Dy / 4
+    py = Area_y / (b * h0)
+    
+    e1 = (p * fy - py * fy) / (a1 * fc)
+    eb = 0.8 / (1 + (fy / (Es * 0.0033)))
+    
+    If (e1 > eb) Then
+        CalCapacity = "超筋"
+        Exit Function
+    End If
+    
+    x = e1 * h0
+    
+    If (x < 2 * BHC) Then
+        
+        CalCapacity = fy * Area * (h0 - BHC) / 1000000
+        Exit Function
+    End If
+
+    CalCapacity = a1 * fc * b * h0 * h0 * e1 * (1 - 0.5 * e1) + fy * Area_y * (h0 - BHC) / 1000000
+
+End Function
+
+
+
+
+
+
