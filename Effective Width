@@ -1,0 +1,43 @@
+Function FIND_S(x As Double)
+
+    '根据D62-2004 17页ps曲线编制
+    
+    Data = [{0.15,0.7;0.1588,0.65;0.1719,0.6;0.1871,0.55;0.2029,0.5;0.2255,0.45;0.2571,0.4;0.2925,0.35;0.3358,0.3;0.3893,0.25;0.4618,0.2;0.5103,0.175;0.5739,0.15;0.6392,0.125;0.7137,0.1;0.8092,0.075;0.8603,0.0625;1.0,0.05}]
+    
+    If x < Data(18, 2) Or x > Data(1, 2) Then
+        MsgBox ("数值太大或太小")
+    End If
+    
+    For i = 2 To 18
+        If x >= Data(i, 2) Then
+            FIND_S = (x - Data(i, 2)) / (Data(i - 1, 2) - Data(i, 2)) * (Data(i, 1) - Data(i - 1, 1))
+            FIND_S = Data(i, 1) - FIND_S
+            FIND_S = Format(FIND_S, "0.000")
+            Exit For
+        End If
+    Next
+    
+End Function
+
+
+Function FIND_F(x As Double)
+
+    '根据D62-2004 17页pf曲线编制
+    
+    Data = [{0.25,0.7;0.27,0.65;0.29,0.6;0.3106,0.55;0.3379,0.5;0.3695,0.45;0.4246,0.4;0.4868,0.35;0.55,0.3;0.6327,0.25;0.7261,0.2;0.8335,0.15;0.92,0.1;1,0.05}]
+    
+    If x < Data(14, 2) Or x > Data(1, 2) Then
+        MsgBox ("数值太大或太小")
+    End If
+    
+    For i = 2 To 14
+        If x >= Data(i, 2) Then
+            FIND_F = (x - Data(i, 2)) / (Data(i - 1, 2) - Data(i, 2)) * (Data(i, 1) - Data(i - 1, 1))
+            FIND_F = Data(i, 1) - FIND_F
+            FIND_F = Format(FIND_F, "0.000")
+            Exit For
+        End If
+    Next
+    
+End Function
+
